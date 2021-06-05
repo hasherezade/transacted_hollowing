@@ -1,8 +1,5 @@
 #include "hollowing_parts.h"
-
-#ifdef _DEBUG
-    #include <iostream>
-#endif
+#include <iostream>
 
 BOOL update_remote_entry_point(PROCESS_INFORMATION &pi, ULONGLONG entry_point_va, bool is32bit)
 {
