@@ -25,7 +25,11 @@ HANDLE make_transacted_section(wchar_t* targetPath, BYTE* payladBuf, DWORD paylo
         std::cerr << "Failed to create transaction!" << std::endl;
         return false;
     }
-    wchar_t* dummy_name = L"dummy.exe";
+    wchar_t dummy_name[MAX_PATH] = { 0 };
+    wchar_t temp_path[MAX_PATH] = { 0 };
+    DWORD size = GetTempPathW(MAX_PATH, temp_path);
+
+    GetTempFileNameW(temp_path, L"TH", 0, dummy_name);
     HANDLE hTransactedFile = CreateFileTransactedW(dummy_name,
         GENERIC_WRITE | GENERIC_READ,
         0,
