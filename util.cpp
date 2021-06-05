@@ -68,42 +68,18 @@ wchar_t* get_directory(IN wchar_t *full_path, OUT wchar_t *out_buf, IN const siz
     }
     return out_buf;
 }
-/*
-BYTE* get_nt_hdrs(IN const BYTE *pe_buffer)
+
+bool get_calc_path(LPWSTR lpwOutPath, DWORD szOutPath, bool isPayl32bit)
 {
-    if (!pe_buffer) return nullptr;
-
-    IMAGE_DOS_HEADER *idh = (IMAGE_DOS_HEADER*)pe_buffer;
-    if (idh->e_magic != IMAGE_DOS_SIGNATURE) {
-        return nullptr;
+    if (isPayl32bit) {
+#ifdef _WIN64
+        ExpandEnvironmentStringsW(L"%SystemRoot%\\SysWoW64\\calc.exe", lpwOutPath, szOutPath);
+#else
+        ExpandEnvironmentStringsW(L"%SystemRoot%\\system32\\calc.exe", lpwOutPath, szOutPath);
+#endif
     }
-    const LONG kMaxOffset = 1024;
-    LONG pe_offset = idh->e_lfanew;
-
-    if (pe_offset > kMaxOffset) return nullptr;
-
-    IMAGE_NT_HEADERS32 *inh = (IMAGE_NT_HEADERS32 *)(pe_buffer + pe_offset);
-    if (inh->Signature != IMAGE_NT_SIGNATURE) {
-        return nullptr;
+    else {
+        ExpandEnvironmentStringsW(L"%SystemRoot%\\system32\\calc.exe", lpwOutPath, szOutPath);
     }
-    return (BYTE*)inh;
+    return true;
 }
-
-WORD get_nt_hdr_architecture(IN const BYTE *pe_buffer)
-{
-    void *ptr = get_nt_hdrs(pe_buffer);
-    if (!ptr) return 0;
-
-    IMAGE_NT_HEADERS32 *inh = static_cast<IMAGE_NT_HEADERS32*>(ptr);
-    return inh->OptionalHeader.Magic;
-}
-
-bool pe_is64bit(IN const BYTE *pe_buffer)
-{
-    WORD arch = get_nt_hdr_architecture(pe_buffer);
-    if (arch == IMAGE_NT_OPTIONAL_HDR64_MAGIC) {
-        return true;
-    }
-    return false;
-}
-*/

@@ -162,25 +162,27 @@ bool transacted_hollowing(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSiz
 
 int wmain(int argc, wchar_t *argv[])
 {
-    
 #ifdef _WIN64
     const bool is32bit = false;
 #else
     const bool is32bit = true;
 #endif
-    if (argc < 3) {
-        std::cout << "Transacted Hollowing ";
+    if (argc < 2) {
+        std::cout << "Transacted Hollowing (";
         if (is32bit) std::cout << "32bit";
         else std::cout << "64bit";
-        std::cout << "\n";
-        std::cout << "params: <payload path> <target path>\n" << std::endl;
+        std::cout << ")\n";
+        std::cout << "params: <payload path> [*target path]\n";
+        std::cout << "* - optional" << std::endl;
         system("pause");
         return 0;
     }
     if (init_ntdll_func() == false) {
         return -1;
     }
-    wchar_t *targetPath = argv[2];
+    wchar_t defaultTarget[MAX_PATH] = { 0 };
+
+    wchar_t *targetPath = (argc > 2) ? argv[2] : defaultTarget;
     wchar_t *payloadPath = argv[1];
     size_t payloadSize = 0;
 
@@ -194,6 +196,8 @@ int wmain(int argc, wchar_t *argv[])
         std::cout << "[ERROR] The injector (32 bit) is not compatibile with the payload (64 bit)\n";
         return 1;
     }
+
+    get_calc_path(defaultTarget, MAX_PATH, isPayl32b);
 
     bool is_ok = transacted_hollowing(targetPath, payladBuf, (DWORD) payloadSize);
 
