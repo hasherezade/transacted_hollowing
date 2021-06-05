@@ -181,8 +181,9 @@ int wmain(int argc, wchar_t *argv[])
         return -1;
     }
     wchar_t defaultTarget[MAX_PATH] = { 0 };
-
+    bool useDefaultTarget = (argc > 2) ? false : true;
     wchar_t *targetPath = (argc > 2) ? argv[2] : defaultTarget;
+
     wchar_t *payloadPath = argv[1];
     size_t payloadSize = 0;
 
@@ -196,8 +197,9 @@ int wmain(int argc, wchar_t *argv[])
         std::cout << "[ERROR] The injector (32 bit) is not compatibile with the payload (64 bit)\n";
         return 1;
     }
-
-    get_calc_path(defaultTarget, MAX_PATH, isPayl32b);
+    if (useDefaultTarget) {
+        get_calc_path(defaultTarget, MAX_PATH, isPayl32b);
+    }
 
     bool is_ok = transacted_hollowing(targetPath, payladBuf, (DWORD) payloadSize);
 
