@@ -3645,22 +3645,6 @@ ZwOpenSection (
     IN POBJECT_ATTRIBUTES ObjectAttributes
     );
 
-/*
-NTSYSCALLAPI 
-NTSTATUS NTAPI 
-NtMapViewOfSection(
-    _In_ HANDLE SectionHandle,
-    _In_ HANDLE ProcessHandle,
-    _Inout_ _At_(*BaseAddress, _Readable_bytes_(*ViewSize) _Writable_bytes_(*ViewSize) _Post_readable_byte_size_(*ViewSize)) PVOID *BaseAddress,
-    _In_ ULONG_PTR ZeroBits, 
-    _In_ SIZE_T CommitSize, 
-    _Inout_opt_ PLARGE_INTEGER SectionOffset, 
-    _Inout_ PSIZE_T ViewSize, 
-    _In_ SECTION_INHERIT InheritDisposition, 
-    _In_ ULONG AllocationType, 
-    _In_ ULONG Win32Protect
-);
-*/
 
 NTSYSAPI
 NTSTATUS
