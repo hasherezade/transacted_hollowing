@@ -5,7 +5,6 @@
 #include <stdio.h>
 
 #include "ntddk.h"
-#include "ntdll_undoc.h"
 #include "kernel32_undoc.h"
 #include "util.h"
 
@@ -176,9 +175,6 @@ int wmain(int argc, wchar_t *argv[])
         std::cout << "* - optional" << std::endl;
         system("pause");
         return 0;
-    }
-    if (init_ntdll_func() == false) {
-        return -1;
     }
     wchar_t defaultTarget[MAX_PATH] = { 0 };
     bool useDefaultTarget = (argc > 2) ? false : true;
