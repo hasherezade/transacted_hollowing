@@ -6,7 +6,7 @@ platform:
   
 branches:
   only:
-    - master
+    - main
         
 install:
   - set PATH=C:\Program Files\CMake\bin;%PATH%
