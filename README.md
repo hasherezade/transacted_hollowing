@@ -1,7 +1,8 @@
 Transacted Hollowing
 ==========
 
-[![Build status](https://ci.appveyor.com/api/projects/status/98mdk3v2y7vysgjd?svg=true)](https://ci.appveyor.com/project/hasherezade/transacted-hollowing)
+[![Build status](https://ci.appveyor.com/api/projects/status/fpgr73aul25gc6kp?svg=true)](https://ci.appveyor.com/project/hasherezade/transacted-hollowing)
+
 
 Transacted Hollowing - a PE injection technique. A hybrid between Process Hollowing and Process Doppelgänging. 
 
