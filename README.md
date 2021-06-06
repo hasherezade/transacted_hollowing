@@ -9,6 +9,14 @@ Transacted Hollowing - a PE injection technique. A hybrid between [Process Hollo
 
 More info [here](https://blog.malwarebytes.com/threat-analysis/2018/08/process-doppelganging-meets-process-hollowing_osiris/)
 
+Characteristics:
+-
+
++ Payload mapped as `MEM_IMAGE` (unnamed: not linked to any file)
++ Sections mapped with original access rights (no `RWX`)
++ Payload connected to PEB as the main module
++ Remote injection supported (but only into a newly created process)
+
 Supported injections:
 -
 If the loader was built as 32 bit:
