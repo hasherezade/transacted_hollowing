@@ -137,10 +137,8 @@ bool transacted_hollowing(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSiz
         return false;
     }
     PROCESS_INFORMATION pi = { 0 };
-    wchar_t dir_path[MAX_PATH] = { 0 };
-    get_directory(targetPath, dir_path, MAX_PATH);
 
-    if (!create_new_process_internal(pi, targetPath, dir_path)) {
+    if (!create_new_process_internal(pi, targetPath, NULL)) {
         std::cerr << "Creating process failed!\n";
         return false;
     }
