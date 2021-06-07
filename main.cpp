@@ -114,7 +114,7 @@ PVOID map_buffer_into_process(HANDLE hProcess, HANDLE hSection)
     SIZE_T viewSize = 0;
     PVOID sectionBaseAddress = 0;
 
-    if ((status = NtMapViewOfSection(hSection, hProcess, &sectionBaseAddress, NULL, NULL, NULL, &viewSize, ViewShare, NULL, PAGE_EXECUTE_READWRITE)) != STATUS_SUCCESS)
+    if ((status = NtMapViewOfSection(hSection, hProcess, &sectionBaseAddress, NULL, NULL, NULL, &viewSize, ViewShare, NULL, PAGE_READONLY)) != STATUS_SUCCESS)
     {
         if (status == STATUS_IMAGE_NOT_AT_BASE) {
             std::cerr << "[WARNING] Image could not be mapped at its original base! If the payload has no relocations, it won't work!\n";
