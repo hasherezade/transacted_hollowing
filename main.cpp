@@ -158,7 +158,7 @@ int wmain(int argc, wchar_t *argv[])
 
     bool is_ok = transacted_hollowing(targetPath, payladBuf, (DWORD) payloadSize);
 
-    free_buffer(payladBuf, payloadSize);
+    free_buffer(payladBuf);
     if (is_ok) {
         std::cerr << "[+] Done!" << std::endl;
     } else {
