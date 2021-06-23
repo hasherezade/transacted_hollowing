@@ -5,9 +5,25 @@ Transacted Hollowing
 
 Transacted Hollowing - a PE injection technique. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Doppelgänging](https://github.com/hasherezade/process_doppelganging). 
 
-![](https://blog.malwarebytes.com/wp-content/uploads/2018/08/osildr1-2_.png)
+![transacted hollowing diagram](/img/transacted_hollowing.png)
 
-More info [here](https://blog.malwarebytes.com/threat-analysis/2018/08/process-doppelganging-meets-process-hollowing_osiris/)
+*More info [here](https://blog.malwarebytes.com/threat-analysis/2018/08/process-doppelganging-meets-process-hollowing_osiris/).*
+
+---
+
+"Ghostly" Hollowing - a similar technique, but using a delete-pending file instead of the transacted file. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Ghosting](https://github.com/hasherezade/process_ghosting). 
+
+
+![ghostly hollowing diagram](/img/ghostly_hollowing.png)
+
+---
+
+You can switch to build the second variant with the help of the CMake option: `GHOSTING`. By default, Transacted Hollowing is built.
+
+![CMake flag](img/ghosting_flag.png)
+
+---
+
 
 Characteristics:
 -
