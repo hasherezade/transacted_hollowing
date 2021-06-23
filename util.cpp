@@ -40,10 +40,10 @@ BYTE *buffer_payload(wchar_t *filename, OUT size_t &r_size)
     return localCopyAddress;
 }
 
-void free_buffer(BYTE* buffer, size_t buffer_size)
+void free_buffer(BYTE* buffer)
 {
     if (buffer == NULL) return;
-    VirtualFree(buffer, buffer_size, MEM_DECOMMIT);
+    VirtualFree(buffer, 0, MEM_RELEASE);
 }
 
 wchar_t* get_file_name(wchar_t *full_path)
