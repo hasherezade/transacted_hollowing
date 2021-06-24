@@ -33,6 +33,8 @@ Characteristics:
 + Payload connected to PEB as the main module
 + Remote injection supported (but only into a newly created process)
 
+![View](img/implant_view.png)
+
 Supported injections:
 -
 If the loader was built as 32 bit:
