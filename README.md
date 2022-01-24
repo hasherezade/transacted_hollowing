@@ -3,7 +3,8 @@ Transacted Hollowing
 
 [![Build status](https://ci.appveyor.com/api/projects/status/fpgr73aul25gc6kp?svg=true)](https://ci.appveyor.com/project/hasherezade/transacted-hollowing)
 
-Transacted Hollowing - a PE injection technique. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Doppelgänging](https://github.com/hasherezade/process_doppelganging). 
+### Transacted Hollowing (classic)
+Transacted Hollowing is a PE injection technique. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Doppelgänging](https://github.com/hasherezade/process_doppelganging). 
 
 ![transacted hollowing diagram](/img/transacted_hollowing.png)
 
@@ -11,7 +12,9 @@ Transacted Hollowing - a PE injection technique. A hybrid between [Process Hollo
 
 ---
 
-"Ghostly" Hollowing - a similar technique, but using a delete-pending file instead of the transacted file. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Ghosting](https://github.com/hasherezade/process_ghosting). 
+
+### Ghostly Hollowing
+Ghostly Hollowing is a similar technique, but using a delete-pending file instead of the transacted file. A hybrid between [Process Hollowing](https://github.com/hasherezade/libpeconv/tree/master/run_pe) and [Process Ghosting](https://github.com/hasherezade/process_ghosting). 
 
 
 ![ghostly hollowing diagram](/img/ghostly_hollowing.png)
