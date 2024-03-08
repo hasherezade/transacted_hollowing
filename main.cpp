@@ -1,5 +1,4 @@
 #include <Windows.h>
-#include <KtmW32.h>
 
 #include <iostream>
 #include <stdio.h>
@@ -12,6 +11,7 @@
 #include "hollowing_parts.h"
 
 #ifndef GHOSTING
+    #include <KtmW32.h>
     #include "transacted_file.h"
 #else
     #include "delete_pending_file.h"
